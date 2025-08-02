@@ -184,6 +184,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/lists/:id", async (req, res) => {
+    try {
+      const updates = insertRestaurantListSchema.partial().parse(req.body);
+      const list = await storage.updateList(req.params.id, updates);
+      if (!list) {
+        return res.status(404).json({ message: "List not found" });
+      }
+      res.json(list);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid update data", error });
+    }
+  });
+
   app.delete("/api/lists/:id", async (req, res) => {
     try {
       const deleted = await storage.deleteList(req.params.id);

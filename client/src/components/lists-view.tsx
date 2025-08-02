@@ -3,7 +3,7 @@ import { Plus, ChevronRight, Heart, Clock, Utensils, Coffee } from "lucide-react
 import { useLists } from "../hooks/use-lists";
 import { useRestaurants } from "../hooks/use-restaurants";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -102,6 +102,9 @@ export default function ListsView() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New List</DialogTitle>
+              <DialogDescription className="sr-only">
+                Create a new list to organize your restaurants
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -140,7 +143,11 @@ export default function ListsView() {
           const IconComponent = iconMap[list.icon as keyof typeof iconMap] || Utensils;
           
           return (
-            <div key={list.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <button 
+              key={list.id} 
+              onClick={() => window.location.pathname = `/lists/${list.id}`}
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200 cursor-pointer text-left w-full"
+            >
               <div className="flex items-center justify-between mb-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                   index === 0 ? 'bg-[hsl(var(--primary))]/10' :
@@ -159,25 +166,31 @@ export default function ListsView() {
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">{list.name}</h3>
               <p className="text-xs text-gray-600">{list.description}</p>
-            </div>
+            </button>
             );
           })}
         </div>
         )}
 
-        {/* All Lists - Only show when there are multiple lists */}
-        {allLists.length > 4 && (
+        {/* All Lists - Show all lists as clickable cards */}
+        {allLists.length > 0 && (
           <div className="space-y-3">
-            <h3 className="font-semibold text-lg text-gray-800 tracking-tight">
-              All Lists
-            </h3>
+            {allLists.length > 4 && (
+              <h3 className="font-semibold text-lg text-gray-800 tracking-tight">
+                All Lists
+              </h3>
+            )}
             
-            {allLists.map((list: any, index: number) => {
+            {allLists.slice(allLists.length <= 4 ? 0 : 4).map((list: any, index: number) => {
           const stats = getListStats(list.id);
           const IconComponent = iconMap[list.icon as keyof typeof iconMap] || Utensils;
           
           return (
-            <div key={list.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <button 
+              key={list.id} 
+              onClick={() => window.location.pathname = `/lists/${list.id}`}
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer text-left w-full"
+            >
               <div className="flex items-center space-x-3">
                 <div className={`w-12 h-12 bg-gradient-to-br rounded-xl flex items-center justify-center ${
                   index % 3 === 0 ? 'from-[hsl(var(--primary))] to-[hsl(var(--pin-red))]' :
@@ -195,11 +208,11 @@ export default function ListsView() {
                     <span className="text-xs text-gray-500">{stats.visitedCount} visited</span>
                   </div>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <div className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                   <ChevronRight className="w-5 h-5 text-gray-400" />
-                </button>
+                </div>
               </div>
-            </div>
+            </button>
             );
           })}
         </div>

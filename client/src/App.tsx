@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import { Landing } from "@/pages/landing";
+import ListDetail from "@/pages/list-detail";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -18,6 +19,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/lists/:id" component={ListDetail} />
         </>
       )}
       <Route component={NotFound} />
