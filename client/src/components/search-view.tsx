@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { Search, MapPin, Star, Plus, Loader2, ExternalLink } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -34,11 +35,25 @@ export default function SearchView() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: searchResults, isLoading: isSearching } = useQuery<SearchResponse>({
+  const { data: searchResults, isLoading: isSearching, error: searchError } = useQuery<SearchResponse>({
     queryKey: ["/api/search/restaurants", searchQuery, location],
     enabled: searchSubmitted && !!searchQuery && !!location,
     retry: false,
   });
+
+  // Handle authentication errors
+  React.useEffect(() => {
+    if (searchError && isUnauthorizedError(searchError)) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+    }
+  }, [searchError, toast]);
 
   const addRestaurantMutation = useMutation({
     mutationFn: async (restaurant: any) => {
@@ -187,6 +202,15 @@ export default function SearchView() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--coral-pink))]" />
             </div>
+          ) : searchError ? (
+            <Card className="p-6 text-center">
+              <div className="text-red-600 mb-2">Search failed</div>
+              <div className="text-gray-600">
+                {isUnauthorizedError(searchError) 
+                  ? "Please log in to search restaurants"
+                  : "Unable to search restaurants. Please try again."}
+              </div>
+            </Card>
           ) : searchResults?.results && searchResults.results.length > 0 ? (
             <div className="space-y-4">
               <h3 className="text-2xl font-semibold text-[hsl(var(--foreground))] mb-4">
