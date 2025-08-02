@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MapPin, Search, User, LogOut, List, BarChart } from "lucide-react";
 import MapView from "../components/map-view";
 import ListsView from "../components/lists-view";
-import CreateListModal from "../components/create-list-modal";
+import { CreateListDialog } from "../components/create-list-dialog";
 import StatsView from "../components/stats-view";
 import SearchView from "@/components/search-view";
 import AddRestaurantModal from "../components/add-restaurant-modal";
@@ -130,7 +130,7 @@ export default function Home() {
       />
       
       {/* Create List Modal */}
-      <CreateListModal
+      <CreateListDialog
         isOpen={isCreateListModalOpen}
         onClose={() => setIsCreateListModalOpen(false)}
       />
