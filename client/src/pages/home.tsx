@@ -40,21 +40,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--bg-cream))]">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Beautiful Gradient Background like Landing Page */}
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-red-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-200 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+      </div>
+      
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+      <header className="relative z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-[hsl(var(--coral-pink))] rounded-lg flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-[#ff6b6b] to-[#ff8e8e] rounded-2xl flex items-center justify-center shadow-lg">
+              <span className="text-lg">🍽️</span>
             </div>
-            <h1 className="font-bold text-xl text-[hsl(var(--foreground))]">
+            <h1 className="font-bold text-xl text-gray-800 tracking-tight">
               FoodieMap
             </h1>
           </div>
           
           <a href="/api/logout">
-            <Button variant="ghost" size="sm" className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 font-medium">
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
@@ -62,10 +68,8 @@ export default function Home() {
         </div>
       </header>
 
-      
-
-      {/* Main Content */}
-      <main className="pb-20">
+      {/* Main Content - Full Height to Bottom Nav */}
+      <main className="relative z-10 h-[calc(100vh-80px)] pb-16 overflow-hidden">
         {renderContent()}
       </main>
 
