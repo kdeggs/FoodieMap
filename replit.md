@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack restaurant discovery and tracking application built with a modern tech stack. The app allows users to discover, organize, and track restaurants they've visited or want to visit. Key features include restaurant management, custom lists, check-ins, location mapping, and personal statistics tracking.
+This is a full-stack restaurant discovery and tracking application built with a modern tech stack. The app allows users to discover, organize, and track restaurants using Google Places API. Key features include restaurant search, custom lists, check-ins, location mapping, and personal statistics tracking.
 
 ## User Preferences
 
@@ -23,6 +23,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful API with JSON responses
 - **Development Server**: Custom Vite integration for hot reloading
 - **Data Storage**: In-memory storage implementation with interface for future database integration
+- **Restaurant Search**: Google Places API integration for real restaurant data
 - **Validation**: Zod schemas for request/response validation
 
 ### Database Schema Design
@@ -40,8 +41,9 @@ Preferred communication style: Simple, everyday language.
 
 ### Mobile-First Design
 - Responsive design optimized for mobile devices
-- Touch-friendly interface with floating action buttons
+- Touch-friendly interface with floating action buttons and bottom navigation
 - Progressive Web App capabilities through Vite configuration
+- Simplified navigation without top tabs for cleaner mobile experience
 
 ## External Dependencies
 

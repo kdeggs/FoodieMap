@@ -26,7 +26,7 @@ export function Landing() {
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-8">
               <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></span>
-              <span className="text-sm font-medium text-gray-700">✨ Now with real restaurant data from Google & Yelp</span>
+              <span className="text-sm font-medium text-gray-700">✨ Now with real restaurant data from Google Places</span>
             </div>
           </div>
           

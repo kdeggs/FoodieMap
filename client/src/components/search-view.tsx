@@ -20,7 +20,7 @@ interface SearchResult {
   photoUrl?: string;
   phoneNumber?: string;
   website?: string;
-  source: 'google' | 'yelp';
+  source: 'google';
 }
 
 interface SearchResponse {
@@ -211,13 +211,9 @@ export default function SearchView() {
                         </h4>
                         <Badge
                           variant="secondary"
-                          className={`ml-2 ${
-                            result.source === 'google'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className="ml-2 bg-blue-100 text-blue-800"
                         >
-                          {result.source === 'google' ? 'Google' : 'Yelp'}
+                          Google
                         </Badge>
                       </div>
                       

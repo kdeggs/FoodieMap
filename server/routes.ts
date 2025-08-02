@@ -30,69 +30,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const googleApiKey = process.env.GOOGLE_PLACES_API_KEY;
-      const yelpApiKey = process.env.YELP_API_KEY;
 
       let results = [];
 
-      // Try Google Places API first if available
-      if (googleApiKey) {
-        try {
-          const response = await fetch(
-            `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(String(query) + ' restaurant ' + String(location))}&type=restaurant&key=${googleApiKey}`
-          );
-          const data = await response.json();
-          
-          if (data.results) {
-            results = data.results.map((place: any) => ({
-              id: place.place_id,
-              name: place.name,
-              address: place.formatted_address,
-              rating: place.rating,
-              priceLevel: place.price_level,
-              latitude: place.geometry?.location?.lat,
-              longitude: place.geometry?.location?.lng,
-              photoUrl: place.photos?.[0] ? 
-                `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${googleApiKey}` 
-                : null,
-              source: 'google'
-            }));
-          }
-        } catch (error) {
-          console.error('Google Places API error:', error);
-        }
+      // Use Google Places API
+      if (!googleApiKey) {
+        return res.status(500).json({ message: "Google Places API key not configured" });
       }
 
-      // If no Google results and Yelp is available, try Yelp
-      if (results.length === 0 && yelpApiKey) {
-        try {
-          const response = await fetch(
-            `https://api.yelp.com/v3/businesses/search?term=${encodeURIComponent(String(query))}&location=${encodeURIComponent(String(location))}&categories=restaurants`,
-            {
-              headers: {
-                'Authorization': `Bearer ${yelpApiKey}`
-              }
-            }
-          );
-          const data = await response.json();
-          
-          if (data.businesses) {
-            results = data.businesses.map((business: any) => ({
-              id: business.id,
-              name: business.name,
-              address: business.location?.display_address?.join(', '),
-              rating: business.rating,
-              priceLevel: business.price?.length || null,
-              latitude: business.coordinates?.latitude,
-              longitude: business.coordinates?.longitude,
-              photoUrl: business.image_url,
-              phoneNumber: business.phone,
-              website: business.url,
-              source: 'yelp'
-            }));
-          }
-        } catch (error) {
-          console.error('Yelp API error:', error);
+      try {
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(String(query) + ' restaurant ' + String(location))}&type=restaurant&key=${googleApiKey}`
+        );
+        const data = await response.json();
+        
+        if (data.results) {
+          results = data.results.map((place: any) => ({
+            id: place.place_id,
+            name: place.name,
+            address: place.formatted_address,
+            rating: place.rating,
+            priceLevel: place.price_level,
+            latitude: place.geometry?.location?.lat,
+            longitude: place.geometry?.location?.lng,
+            photoUrl: place.photos?.[0] ? 
+              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${googleApiKey}` 
+              : null,
+            source: 'google'
+          }));
         }
+      } catch (error) {
+        console.error('Google Places API error:', error);
+        return res.status(500).json({ message: "Error searching restaurants" });
       }
 
       res.json({ results });
