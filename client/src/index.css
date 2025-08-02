@@ -66,12 +66,41 @@
     background-color: hsl(var(--bg-cream));
     color: hsl(var(--foreground));
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Fredoka', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     font-weight: 600;
+    line-height: 1.2;
   }
+
+  /* Ensure emojis display properly */
+  .emoji-icon {
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Additional animation classes */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.6); }
+}
+
+.glow {
+  animation: glow 2s ease-in-out infinite;
 }
 
 /* Leaflet map overrides */

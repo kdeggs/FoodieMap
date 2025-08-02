@@ -69,8 +69,8 @@ export default function Home() {
             onClick={() => setActiveTab("map")}
             className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
               activeTab === "map"
-                ? "text-[hsl(var(--primary))] border-b-2 border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/5"
-                : "text-gray-600 hover:text-[hsl(var(--primary))]"
+                ? "text-[hsl(var(--coral-pink))] border-b-2 border-[hsl(var(--coral-pink))] bg-[hsl(var(--coral-pink))]/5"
+                : "text-gray-600 hover:text-[hsl(var(--coral-pink))]"
             }`}
           >
             <MapPin className="w-4 h-4 inline mr-2" />
@@ -80,8 +80,8 @@ export default function Home() {
             onClick={() => setActiveTab("lists")}
             className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
               activeTab === "lists"
-                ? "text-[hsl(var(--primary))] border-b-2 border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/5"
-                : "text-gray-600 hover:text-[hsl(var(--primary))]"
+                ? "text-[hsl(var(--coral-pink))] border-b-2 border-[hsl(var(--coral-pink))] bg-[hsl(var(--coral-pink))]/5"
+                : "text-gray-600 hover:text-[hsl(var(--coral-pink))]"
             }`}
           >
             <List className="w-4 h-4 inline mr-2" />
@@ -91,8 +91,8 @@ export default function Home() {
             onClick={() => setActiveTab("stats")}
             className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
               activeTab === "stats"
-                ? "text-[hsl(var(--primary))] border-b-2 border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/5"
-                : "text-gray-600 hover:text-[hsl(var(--primary))]"
+                ? "text-[hsl(var(--coral-pink))] border-b-2 border-[hsl(var(--coral-pink))] bg-[hsl(var(--coral-pink))]/5"
+                : "text-gray-600 hover:text-[hsl(var(--coral-pink))]"
             }`}
           >
             <BarChart className="w-4 h-4 inline mr-2" />
@@ -115,7 +115,7 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("map")}
             className={`flex flex-col items-center py-2 transition-colors ${
-              activeTab === "map" ? "text-[hsl(var(--primary))]" : "text-gray-400"
+              activeTab === "map" ? "text-[hsl(var(--coral-pink))]" : "text-gray-400"
             }`}
           >
             <MapPin className="w-6 h-6 mb-1" />
@@ -124,7 +124,7 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("lists")}
             className={`flex flex-col items-center py-2 transition-colors ${
-              activeTab === "lists" ? "text-[hsl(var(--primary))]" : "text-gray-400"
+              activeTab === "lists" ? "text-[hsl(var(--coral-pink))]" : "text-gray-400"
             }`}
           >
             <List className="w-6 h-6 mb-1" />
@@ -142,7 +142,7 @@ export default function Home() {
           <button
             onClick={() => setActiveTab("profile")}
             className={`flex flex-col items-center py-2 transition-colors ${
-              activeTab === "profile" ? "text-[hsl(var(--primary))]" : "text-gray-400"
+              activeTab === "profile" ? "text-[hsl(var(--coral-pink))]" : "text-gray-400"
             }`}
           >
             <User className="w-6 h-6 mb-1" />
