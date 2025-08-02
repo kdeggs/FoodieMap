@@ -62,44 +62,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Tab Navigation */}
-      <nav className="bg-white border-b border-gray-100 sticky top-16 z-40">
-        <div className="flex">
-          <button
-            onClick={() => setActiveTab("map")}
-            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
-              activeTab === "map"
-                ? "text-[hsl(var(--coral-pink))] border-b-2 border-[hsl(var(--coral-pink))] bg-[hsl(var(--coral-pink))]/5"
-                : "text-gray-600 hover:text-[hsl(var(--coral-pink))]"
-            }`}
-          >
-            <MapPin className="w-4 h-4 inline mr-2" />
-            Map
-          </button>
-          <button
-            onClick={() => setActiveTab("lists")}
-            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
-              activeTab === "lists"
-                ? "text-[hsl(var(--coral-pink))] border-b-2 border-[hsl(var(--coral-pink))] bg-[hsl(var(--coral-pink))]/5"
-                : "text-gray-600 hover:text-[hsl(var(--coral-pink))]"
-            }`}
-          >
-            <List className="w-4 h-4 inline mr-2" />
-            Lists
-          </button>
-          <button
-            onClick={() => setActiveTab("stats")}
-            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
-              activeTab === "stats"
-                ? "text-[hsl(var(--coral-pink))] border-b-2 border-[hsl(var(--coral-pink))] bg-[hsl(var(--coral-pink))]/5"
-                : "text-gray-600 hover:text-[hsl(var(--coral-pink))]"
-            }`}
-          >
-            <BarChart className="w-4 h-4 inline mr-2" />
-            Stats
-          </button>
-        </div>
-      </nav>
+      
 
       {/* Main Content */}
       <main className="pb-20">
