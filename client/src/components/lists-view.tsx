@@ -115,25 +115,26 @@ export default function ListsView() {
 
       <div className="flex-1 px-4 pb-4">
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New List</DialogTitle>
               <DialogDescription>
                 Create a new list to organize your restaurants
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={(e) => { e.preventDefault(); handleCreateList(); }} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleCreateList(); }} className="space-y-4 mt-4">
               <div>
-                <label className="block text-sm font-medium mb-2">List Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">List Name</label>
                 <Input
                   value={newListName}
                   onChange={(e) => setNewListName(e.target.value)}
                   placeholder="Enter list name"
                   autoFocus
+                  required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Description (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
                 <Textarea
                   value={newListDescription}
                   onChange={(e) => setNewListDescription(e.target.value)}
@@ -141,7 +142,7 @@ export default function ListsView() {
                   rows={3}
                 />
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-6">
                 <Button 
                   type="button"
                   variant="outline"
