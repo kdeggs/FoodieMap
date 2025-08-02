@@ -39,11 +39,14 @@ Preferred communication style: Simple, everyday language.
 - Session-based authentication framework ready (connect-pg-simple for session storage)
 - Currently operating without authentication for development
 
-### Mobile-First Design
+### Mobile-First Design & UX
 - Responsive design optimized for mobile devices
-- Touch-friendly interface with floating action buttons and bottom navigation
+- Touch-friendly interface with expandable floating action buttons and bottom navigation
 - Progressive Web App capabilities through Vite configuration
 - Simplified navigation without top tabs for cleaner mobile experience
+- Modern expandable FAB system with contextual actions (add restaurant, create list)
+- Beautiful gradient color scheme matching landing page throughout the app
+- Glass-morphism effects with backdrop blur for modern visual appeal
 
 ## External Dependencies
 

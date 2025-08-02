@@ -87,18 +87,18 @@ export default function ListsView() {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-bold text-2xl" style={{ fontFamily: 'Poppins' }}>
-          My Lists
-        </h2>
+    <div className="h-full flex flex-col">
+      {/* Header - Only show when there are lists */}
+      {allLists.length > 0 && (
+        <div className="px-4 pt-4 pb-2">
+          <h2 className="font-bold text-2xl text-gray-800 tracking-tight">
+            My Lists
+          </h2>
+        </div>
+      )}
+
+      <div className="flex-1 px-4 pb-4">
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90">
-              <Plus className="w-4 h-4 mr-2" />
-              New List
-            </Button>
-          </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New List</DialogTitle>
@@ -131,11 +131,11 @@ export default function ListsView() {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
-      {/* Featured Lists */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {featuredLists.map((list: any, index: number) => {
+        {/* Featured Lists - Only show when there are lists */}
+        {allLists.length > 0 && (
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {featuredLists.map((list: any, index: number) => {
           const stats = getListStats(list.id);
           const IconComponent = iconMap[list.icon as keyof typeof iconMap] || Utensils;
           
@@ -160,17 +160,19 @@ export default function ListsView() {
               <h3 className="font-semibold text-gray-900 mb-1">{list.name}</h3>
               <p className="text-xs text-gray-600">{list.description}</p>
             </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+        )}
 
-      {/* All Lists */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-lg" style={{ fontFamily: 'Poppins' }}>
-          All Lists
-        </h3>
-        
-        {allLists.map((list: any, index: number) => {
+        {/* All Lists - Only show when there are multiple lists */}
+        {allLists.length > 4 && (
+          <div className="space-y-3">
+            <h3 className="font-semibold text-lg text-gray-800 tracking-tight">
+              All Lists
+            </h3>
+            
+            {allLists.map((list: any, index: number) => {
           const stats = getListStats(list.id);
           const IconComponent = iconMap[list.icon as keyof typeof iconMap] || Utensils;
           
@@ -198,26 +200,31 @@ export default function ListsView() {
                 </button>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {allLists.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Utensils className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No lists yet</h3>
-          <p className="text-gray-600 mb-4">Create your first list to organize your restaurants</p>
-          <Button 
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Your First List
-          </Button>
+            );
+          })}
         </div>
-      )}
+        )}
+
+        {/* Empty State */}
+        {allLists.length === 0 && (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#ff6b6b] to-[#ff8e8e] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+                <span className="text-3xl">📝</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">No lists yet</h3>
+              <p className="text-gray-600 mb-6">Create your first list to organize your restaurants</p>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="bg-gradient-to-br from-[#ff6b6b] to-[#ff8e8e] text-white font-semibold px-8 py-3 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 hover:from-[#ff5252] hover:to-[#ff7979]"
+              >
+                <Plus className="w-5 h-5 mr-2 inline" />
+                Create Your First List
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

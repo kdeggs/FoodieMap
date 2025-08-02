@@ -5,7 +5,7 @@ import ListsView from "../components/lists-view";
 import StatsView from "../components/stats-view";
 import SearchView from "@/components/search-view";
 import AddRestaurantModal from "../components/add-restaurant-modal";
-import FloatingActionButton from "../components/floating-action-button";
+import ExpandableFab from "../components/expandable-fab";
 import { Button } from "@/components/ui/button";
 
 type TabType = "map" | "lists" | "stats" | "search" | "profile";
@@ -13,6 +13,7 @@ type TabType = "map" | "lists" | "stats" | "search" | "profile";
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("map");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -73,8 +74,11 @@ export default function Home() {
         {renderContent()}
       </main>
 
-      {/* Floating Action Button */}
-      <FloatingActionButton onClick={() => setIsAddModalOpen(true)} />
+      {/* Expandable Floating Action Button */}
+      <ExpandableFab 
+        onAddRestaurant={() => setIsAddModalOpen(true)}
+        onCreateList={() => setIsCreateListModalOpen(true)}
+      />
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
