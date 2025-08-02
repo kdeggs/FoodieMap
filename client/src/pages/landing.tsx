@@ -21,11 +21,7 @@ export function Landing() {
             </div>
             <h1 className="text-3xl font-bold text-[hsl(var(--foreground))] tracking-tight">FoodieMap</h1>
           </div>
-          <a href="/api/login">
-            <Button className="bg-[hsl(var(--coral-pink))] hover:bg-[hsl(var(--coral-pink)/90)] text-white font-semibold rounded-full px-8 py-3 shadow-lg hover:shadow-xl transition-all">
-              Sign In
-            </Button>
-          </a>
+          
         </nav>
 
         <div className="max-w-6xl mx-auto text-center">
