@@ -187,7 +187,7 @@ export default function SearchView() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--coral-pink))]" />
             </div>
-          ) : searchResults?.results?.length > 0 ? (
+          ) : searchResults?.results && searchResults.results.length > 0 ? (
             <div className="space-y-4">
               <h3 className="text-2xl font-semibold text-[hsl(var(--foreground))] mb-4">
                 Search Results ({searchResults.results.length})
