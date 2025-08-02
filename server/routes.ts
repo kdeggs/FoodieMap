@@ -1,13 +1,49 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertRestaurantSchema, insertRestaurantListSchema, insertListRestaurantSchema, insertCheckInSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Restaurants
-  app.get("/api/restaurants", async (req, res) => {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const restaurants = await storage.getRestaurants();
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Restaurant search API
+  app.get("/api/search/restaurants", isAuthenticated, async (req, res) => {
+    try {
+      const { query, location } = req.query;
+      
+      if (!query || !location) {
+        return res.status(400).json({ message: "Query and location are required" });
+      }
+
+      // For now, return a placeholder response until we set up a proper API
+      res.json({ 
+        results: [],
+        message: "Restaurant search API not yet configured. Please provide an API key."
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to search restaurants" });
+    }
+  });
+
+  // Restaurants
+  app.get("/api/restaurants", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const restaurants = await storage.getRestaurants(userId);
       res.json(restaurants);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch restaurants" });
@@ -26,9 +62,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/restaurants", async (req, res) => {
+  app.post("/api/restaurants", isAuthenticated, async (req: any, res) => {
     try {
-      const validatedData = insertRestaurantSchema.parse(req.body);
+      const userId = req.user.claims.sub;
+      const validatedData = insertRestaurantSchema.parse({ ...req.body, userId });
       const restaurant = await storage.createRestaurant(validatedData);
       res.status(201).json(restaurant);
     } catch (error) {
@@ -62,9 +99,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lists
-  app.get("/api/lists", async (req, res) => {
+  app.get("/api/lists", isAuthenticated, async (req: any, res) => {
     try {
-      const lists = await storage.getLists();
+      const userId = req.user.claims.sub;
+      const lists = await storage.getLists(userId);
       res.json(lists);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch lists" });
@@ -83,9 +121,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/lists", async (req, res) => {
+  app.post("/api/lists", isAuthenticated, async (req: any, res) => {
     try {
-      const validatedData = insertRestaurantListSchema.parse(req.body);
+      const userId = req.user.claims.sub;
+      const validatedData = insertRestaurantListSchema.parse({ ...req.body, userId });
       const list = await storage.createList(validatedData);
       res.status(201).json(list);
     } catch (error) {
@@ -150,9 +189,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/checkins", async (req, res) => {
+  app.post("/api/checkins", isAuthenticated, async (req: any, res) => {
     try {
-      const validatedData = insertCheckInSchema.parse(req.body);
+      const userId = req.user.claims.sub;
+      const validatedData = insertCheckInSchema.parse({ ...req.body, userId });
       const checkIn = await storage.createCheckIn(validatedData);
       res.status(201).json(checkIn);
     } catch (error) {

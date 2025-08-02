@@ -6,20 +6,26 @@ import {
   type ListRestaurant,
   type InsertListRestaurant,
   type CheckIn,
-  type InsertCheckIn
+  type InsertCheckIn,
+  type User,
+  type UpsertUser
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
+  // User operations (mandatory for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
   // Restaurants
-  getRestaurants(): Promise<Restaurant[]>;
+  getRestaurants(userId: string): Promise<Restaurant[]>;
   getRestaurant(id: string): Promise<Restaurant | undefined>;
   createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant>;
   updateRestaurant(id: string, restaurant: Partial<InsertRestaurant>): Promise<Restaurant | undefined>;
   deleteRestaurant(id: string): Promise<boolean>;
 
   // Lists
-  getLists(): Promise<RestaurantList[]>;
+  getLists(userId: string): Promise<RestaurantList[]>;
   getList(id: string): Promise<RestaurantList | undefined>;
   createList(list: InsertRestaurantList): Promise<RestaurantList>;
   updateList(id: string, list: Partial<InsertRestaurantList>): Promise<RestaurantList | undefined>;
@@ -50,33 +56,46 @@ export class MemStorage implements IStorage {
   private lists: Map<string, RestaurantList>;
   private listRestaurants: Map<string, ListRestaurant>;
   private checkIns: Map<string, CheckIn>;
+  private users: Map<string, User>;
 
   constructor() {
     this.restaurants = new Map();
     this.lists = new Map();
     this.listRestaurants = new Map();
     this.checkIns = new Map();
+    this.users = new Map();
     
     // Initialize with default lists
     this.initializeDefaultLists();
   }
 
   private initializeDefaultLists() {
-    const defaultLists = [
-      { name: "Favorites", description: "Must-visit restaurants", icon: "heart", color: "primary" },
-      { name: "Want to Try", description: "Upcoming visits", icon: "clock", color: "secondary" },
-      { name: "Fine Dining", description: "Special occasion restaurants", icon: "utensils", color: "primary" },
-      { name: "Coffee Shops", description: "Great places to work and relax", icon: "coffee", color: "accent" },
-    ];
-
-    defaultLists.forEach(list => {
-      const id = randomUUID();
-      this.lists.set(id, { ...list, id, createdAt: new Date() });
-    });
+    // Skip initialization in memory storage since lists are now user-specific
   }
 
-  async getRestaurants(): Promise<Restaurant[]> {
-    return Array.from(this.restaurants.values());
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const id = userData.id || randomUUID();
+    const existingUser = this.users.get(id);
+    const user: User = {
+      id,
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      createdAt: existingUser?.createdAt || new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async getRestaurants(userId: string): Promise<Restaurant[]> {
+    return Array.from(this.restaurants.values()).filter(r => r.userId === userId);
   }
 
   async getRestaurant(id: string): Promise<Restaurant | undefined> {
@@ -86,16 +105,23 @@ export class MemStorage implements IStorage {
   async createRestaurant(insertRestaurant: InsertRestaurant): Promise<Restaurant> {
     const id = randomUUID();
     const restaurant: Restaurant = { 
-      ...insertRestaurant, 
-      id, 
-      createdAt: new Date(),
-      rating: insertRestaurant.rating || 0,
-      isVisited: insertRestaurant.isVisited || false,
-      checkInCount: insertRestaurant.checkInCount || 0,
+      id,
+      userId: insertRestaurant.userId,
+      name: insertRestaurant.name,
+      cuisine: insertRestaurant.cuisine,
+      priceRange: insertRestaurant.priceRange,
       address: insertRestaurant.address || null,
       latitude: insertRestaurant.latitude || null,
       longitude: insertRestaurant.longitude || null,
-      notes: insertRestaurant.notes || null
+      rating: insertRestaurant.rating || 0,
+      notes: insertRestaurant.notes || null,
+      isVisited: insertRestaurant.isVisited || false,
+      checkInCount: insertRestaurant.checkInCount || 0,
+      placeId: insertRestaurant.placeId || null,
+      photoUrl: insertRestaurant.photoUrl || null,
+      phoneNumber: insertRestaurant.phoneNumber || null,
+      website: insertRestaurant.website || null,
+      createdAt: new Date(),
     };
     this.restaurants.set(id, restaurant);
     return restaurant;
@@ -114,8 +140,8 @@ export class MemStorage implements IStorage {
     return this.restaurants.delete(id);
   }
 
-  async getLists(): Promise<RestaurantList[]> {
-    return Array.from(this.lists.values());
+  async getLists(userId: string): Promise<RestaurantList[]> {
+    return Array.from(this.lists.values()).filter(l => l.userId === userId);
   }
 
   async getList(id: string): Promise<RestaurantList | undefined> {
