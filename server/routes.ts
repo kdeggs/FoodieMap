@@ -2,14 +2,19 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertRestaurantSchema, insertRestaurantListSchema, insertListRestaurantSchema, insertCheckInSchema } from "@shared/schema";
+import {
+  insertRestaurantSchema,
+  insertRestaurantListSchema,
+  insertListRestaurantSchema,
+  insertCheckInSchema,
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -24,9 +29,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/search/restaurants", isAuthenticated, async (req, res) => {
     try {
       const { query, location } = req.query;
-      
+
       if (!query || !location) {
-        return res.status(400).json({ message: "Query and location are required" });
+        return res
+          .status(400)
+          .json({ message: "Query and location are required" });
       }
 
       const googleApiKey = process.env.GOOGLE_PLACES_API_KEY;
@@ -35,28 +42,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Use Google Places API
       if (!googleApiKey) {
-        return res.status(500).json({ message: "Google Places API key not configured" });
+        return res
+          .status(500)
+          .json({ message: "Google Places API key not configured" });
       }
 
       try {
-        const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(String(query) + ' restaurant ' + String(location))}&type=restaurant&key=${googleApiKey}`;
-        console.log('Google Places API URL:', searchUrl.replace(googleApiKey, 'API_KEY_HIDDEN'));
-        
+        const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(String(query) + " restaurant " + String(location))}&type=restaurant&key=${googleApiKey}`;
+
         const response = await fetch(searchUrl);
         const data = await response.json();
-        
-        console.log('Google Places API Response Status:', data.status);
-        console.log('Google Places API Results Count:', data.results?.length || 0);
-        
+
         if (data.error_message) {
-          console.error('Google Places API Error:', data.error_message);
+          console.error("Google Places API Error:", data.error_message);
           return res.status(500).json({ message: data.error_message });
         }
-        
-        if (data.status === 'ZERO_RESULTS') {
-          console.log('No results found for query:', query, 'location:', location);
-        }
-        
+
         if (data.results && data.results.length > 0) {
           results = data.results.map((place: any) => ({
             id: place.place_id,
@@ -66,20 +67,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
             priceLevel: place.price_level,
             latitude: place.geometry?.location?.lat,
             longitude: place.geometry?.location?.lng,
-            photoUrl: place.photos?.[0] ? 
-              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${googleApiKey}` 
+            photoUrl: place.photos?.[0]
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${googleApiKey}`
               : null,
-            source: 'google'
+            source: "google",
           }));
         }
       } catch (error) {
-        console.error('Google Places API error:', error);
+        console.error("Google Places API error:", error);
         return res.status(500).json({ message: "Error searching restaurants" });
       }
 
       res.json({ results });
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
       res.status(500).json({ message: "Failed to search restaurants" });
     }
   });
@@ -110,7 +111,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/restaurants", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const validatedData = insertRestaurantSchema.parse({ ...req.body, userId });
+      const validatedData = insertRestaurantSchema.parse({
+        ...req.body,
+        userId,
+      });
       const restaurant = await storage.createRestaurant(validatedData);
       res.status(201).json(restaurant);
     } catch (error) {
@@ -169,7 +173,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/lists", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const validatedData = insertRestaurantListSchema.parse({ ...req.body, userId });
+      const validatedData = insertRestaurantListSchema.parse({
+        ...req.body,
+        userId,
+      });
       const list = await storage.createList(validatedData);
       res.status(201).json(list);
     } catch (error) {
@@ -203,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertListRestaurantSchema.parse({
         ...req.body,
-        listId: req.params.listId
+        listId: req.params.listId,
       });
       const listRestaurant = await storage.addRestaurantToList(validatedData);
       res.status(201).json(listRestaurant);
@@ -212,17 +219,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/lists/:listId/restaurants/:restaurantId", async (req, res) => {
-    try {
-      const removed = await storage.removeRestaurantFromList(req.params.listId, req.params.restaurantId);
-      if (!removed) {
-        return res.status(404).json({ message: "Restaurant not found in list" });
+  app.delete(
+    "/api/lists/:listId/restaurants/:restaurantId",
+    async (req, res) => {
+      try {
+        const removed = await storage.removeRestaurantFromList(
+          req.params.listId,
+          req.params.restaurantId,
+        );
+        if (!removed) {
+          return res
+            .status(404)
+            .json({ message: "Restaurant not found in list" });
+        }
+        res.status(204).send();
+      } catch (error) {
+        res
+          .status(500)
+          .json({ message: "Failed to remove restaurant from list" });
       }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to remove restaurant from list" });
-    }
-  });
+    },
+  );
 
   // Check-ins
   app.get("/api/restaurants/:id/checkins", async (req, res) => {
