@@ -109,11 +109,17 @@ export default function AddRestaurantModal({ isOpen, onClose }: AddRestaurantMod
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto slide-up">
-        <DialogHeader>
-          <DialogTitle className="font-bold text-xl" style={{ fontFamily: 'Poppins' }}>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-bold text-xl" style={{ fontFamily: 'Poppins' }}>
             Add Restaurant
-          </DialogTitle>
-        </DialogHeader>
+          </h3>
+          <button 
+            onClick={handleClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
