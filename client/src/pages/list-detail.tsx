@@ -258,14 +258,14 @@ export default function ListDetail() {
                 rows={3}
               />
             </div>
-            <div className="flex justify-end space-x-3">
-              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
+            <div className="flex gap-3 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)} className="flex-1">
                 Cancel
               </Button>
               <Button 
                 type="submit"
                 disabled={!editName.trim() || updateListMutation.isPending}
-                className="bg-gradient-to-br from-[#ff6b6b] to-[#ff8e8e] text-white hover:from-[#ff5252] hover:to-[#ff7979]"
+                className="flex-1 bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90"
               >
                 {updateListMutation.isPending ? "Updating..." : "Update List"}
               </Button>
@@ -283,14 +283,15 @@ export default function ListDetail() {
               Are you sure you want to delete "{list?.name}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end space-x-3 mt-4">
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="flex-1">
               Cancel
             </Button>
             <Button 
               onClick={handleDelete}
               disabled={deleteListMutation.isPending}
               variant="destructive"
+              className="flex-1"
             >
               {deleteListMutation.isPending ? "Deleting..." : "Delete List"}
             </Button>

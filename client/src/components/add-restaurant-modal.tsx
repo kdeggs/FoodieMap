@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -108,18 +107,13 @@ export default function AddRestaurantModal({ isOpen, onClose }: AddRestaurantMod
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto slide-up">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-bold text-xl" style={{ fontFamily: 'Poppins' }}>
-            Add Restaurant
-          </h3>
-          <button 
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
+      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Add Restaurant</DialogTitle>
+          <DialogDescription>
+            Add a new restaurant to your collection
+          </DialogDescription>
+        </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -241,13 +235,23 @@ export default function AddRestaurantModal({ isOpen, onClose }: AddRestaurantMod
             />
           </div>
           
-          <Button 
-            type="submit" 
-            disabled={createRestaurantMutation.isPending}
-            className="w-full bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90"
-          >
-            {createRestaurantMutation.isPending ? "Saving..." : "Save Restaurant"}
-          </Button>
+          <div className="flex gap-3 pt-4">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={createRestaurantMutation.isPending || !formData.name.trim() || !formData.cuisine || !formData.priceRange}
+              className="flex-1 bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90"
+            >
+              {createRestaurantMutation.isPending ? "Saving..." : "Save Restaurant"}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
