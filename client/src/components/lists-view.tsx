@@ -115,10 +115,10 @@ export default function ListsView() {
 
       <div className="flex-1 px-4 pb-4">
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Create New List</DialogTitle>
-              <DialogDescription className="sr-only">
+              <DialogDescription>
                 Create a new list to organize your restaurants
               </DialogDescription>
             </DialogHeader>
