@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Search, User, LogOut } from "lucide-react";
+import { MapPin, Search, User, LogOut, List, BarChart } from "lucide-react";
 import MapView from "../components/map-view";
 import ListsView from "../components/lists-view";
 import StatsView from "../components/stats-view";
@@ -84,7 +84,7 @@ export default function Home() {
                 : "text-gray-600 hover:text-[hsl(var(--primary))]"
             }`}
           >
-            <i className="fas fa-list mr-2"></i>
+            <List className="w-4 h-4 inline mr-2" />
             Lists
           </button>
           <button
@@ -95,7 +95,7 @@ export default function Home() {
                 : "text-gray-600 hover:text-[hsl(var(--primary))]"
             }`}
           >
-            <i className="fas fa-chart-bar mr-2"></i>
+            <BarChart className="w-4 h-4 inline mr-2" />
             Stats
           </button>
         </div>
@@ -127,7 +127,7 @@ export default function Home() {
               activeTab === "lists" ? "text-[hsl(var(--primary))]" : "text-gray-400"
             }`}
           >
-            <i className="fas fa-list text-xl mb-1"></i>
+            <List className="w-6 h-6 mb-1" />
             <span className="text-xs font-medium">Lists</span>
           </button>
           <button
