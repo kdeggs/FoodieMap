@@ -39,12 +39,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(String(query) + ' restaurant ' + String(location))}&type=restaurant&key=${googleApiKey}`
-        );
+        const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(String(query) + ' restaurant ' + String(location))}&type=restaurant&key=${googleApiKey}`;
+        console.log('Google Places API URL:', searchUrl.replace(googleApiKey, 'API_KEY_HIDDEN'));
+        
+        const response = await fetch(searchUrl);
         const data = await response.json();
         
-        if (data.results) {
+        console.log('Google Places API Response Status:', data.status);
+        console.log('Google Places API Results Count:', data.results?.length || 0);
+        
+        if (data.error_message) {
+          console.error('Google Places API Error:', data.error_message);
+          return res.status(500).json({ message: data.error_message });
+        }
+        
+        if (data.status === 'ZERO_RESULTS') {
+          console.log('No results found for query:', query, 'location:', location);
+        }
+        
+        if (data.results && data.results.length > 0) {
           results = data.results.map((place: any) => ({
             id: place.place_id,
             name: place.name,
