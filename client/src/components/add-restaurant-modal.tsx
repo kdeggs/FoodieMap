@@ -106,7 +106,7 @@ export default function AddRestaurantModal({ isOpen, onClose }: AddRestaurantMod
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
       <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Restaurant</DialogTitle>

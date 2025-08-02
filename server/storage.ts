@@ -11,6 +11,14 @@ import {
   type UpsertUser
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { restaurants, restaurantLists, listRestaurants, checkIns, users } from "@shared/schema";
+import { eq, and, sql } from "drizzle-orm";
+
+let db: any;
+if (process.env.DATABASE_URL) {
+  const dbModule = await import("./db");
+  db = dbModule.db;
+}
 
 export interface IStorage {
   // User operations (mandatory for Replit Auth)
@@ -287,4 +295,203 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Storage selection is added below
+class DbStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
+          updatedAt: sql`now()`,
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async getRestaurants(userId: string): Promise<Restaurant[]> {
+    return db.select().from(restaurants).where(eq(restaurants.userId, userId));
+  }
+
+  async getRestaurant(id: string): Promise<Restaurant | undefined> {
+    const [restaurant] = await db
+      .select()
+      .from(restaurants)
+      .where(eq(restaurants.id, id));
+    return restaurant;
+  }
+
+  async createRestaurant(data: InsertRestaurant): Promise<Restaurant> {
+    const [restaurant] = await db.insert(restaurants).values(data).returning();
+    return restaurant;
+  }
+
+  async updateRestaurant(
+    id: string,
+    updates: Partial<InsertRestaurant>,
+  ): Promise<Restaurant | undefined> {
+    const [restaurant] = await db
+      .update(restaurants)
+      .set(updates)
+      .where(eq(restaurants.id, id))
+      .returning();
+    return restaurant;
+  }
+
+  async deleteRestaurant(id: string): Promise<boolean> {
+    const result = await db.delete(restaurants).where(eq(restaurants.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getLists(userId: string): Promise<RestaurantList[]> {
+    return db
+      .select()
+      .from(restaurantLists)
+      .where(eq(restaurantLists.userId, userId));
+  }
+
+  async getList(id: string): Promise<RestaurantList | undefined> {
+    const [list] = await db
+      .select()
+      .from(restaurantLists)
+      .where(eq(restaurantLists.id, id));
+    return list;
+  }
+
+  async createList(data: InsertRestaurantList): Promise<RestaurantList> {
+    const [list] = await db.insert(restaurantLists).values(data).returning();
+    return list;
+  }
+
+  async updateList(
+    id: string,
+    updates: Partial<InsertRestaurantList>,
+  ): Promise<RestaurantList | undefined> {
+    const [list] = await db
+      .update(restaurantLists)
+      .set(updates)
+      .where(eq(restaurantLists.id, id))
+      .returning();
+    return list;
+  }
+
+  async deleteList(id: string): Promise<boolean> {
+    const result = await db
+      .delete(restaurantLists)
+      .where(eq(restaurantLists.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getListRestaurants(listId: string): Promise<Restaurant[]> {
+    const rows = await db
+      .select({ restaurant: restaurants })
+      .from(listRestaurants)
+      .leftJoin(
+        restaurants,
+        eq(listRestaurants.restaurantId, restaurants.id),
+      )
+      .where(eq(listRestaurants.listId, listId));
+    return rows.map((r) => r.restaurant).filter(Boolean) as Restaurant[];
+  }
+
+  async addRestaurantToList(data: InsertListRestaurant): Promise<ListRestaurant> {
+    const [lr] = await db.insert(listRestaurants).values(data).returning();
+    return lr;
+  }
+
+  async removeRestaurantFromList(
+    listId: string,
+    restaurantId: string,
+  ): Promise<boolean> {
+    const result = await db
+      .delete(listRestaurants)
+      .where(
+        and(
+          eq(listRestaurants.listId, listId),
+          eq(listRestaurants.restaurantId, restaurantId),
+        ),
+      );
+    return result.rowCount > 0;
+  }
+
+  async getCheckIns(restaurantId: string): Promise<CheckIn[]> {
+    return db
+      .select()
+      .from(checkIns)
+      .where(eq(checkIns.restaurantId, restaurantId));
+  }
+
+  async createCheckIn(data: InsertCheckIn): Promise<CheckIn> {
+    const [ci] = await db.insert(checkIns).values(data).returning();
+    await db
+      .update(restaurants)
+      .set({
+        isVisited: true,
+        checkInCount: sql`${restaurants.checkInCount} + 1`,
+      })
+      .where(eq(restaurants.id, data.restaurantId));
+    return ci;
+  }
+
+  async getStats(userId?: string) {
+    const where = userId ? eq(restaurants.userId, userId) : undefined;
+    const [countRow] = await db
+      .select({
+        total: sql<number>`count(*)`,
+        visited: sql<number>`count(*) filter (where ${restaurants.isVisited})`,
+      })
+      .from(restaurants)
+      .where(where);
+
+    const [checkRow] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(checkIns)
+      .where(userId ? eq(checkIns.userId, userId) : undefined);
+
+    const [avgRow] = await db
+      .select({ avg: sql<number>`avg(${checkIns.rating})` })
+      .from(checkIns)
+      .where(
+        userId
+          ? and(eq(checkIns.userId, userId), sql`${checkIns.rating} is not null`)
+          : sql`${checkIns.rating} is not null`,
+      );
+
+    const topCuisines = await db
+      .select({
+        cuisine: restaurants.cuisine,
+        count: sql<number>`count(*)`,
+      })
+      .from(restaurants)
+      .where(where)
+      .groupBy(restaurants.cuisine)
+      .orderBy(sql`count(*) desc`)
+      .limit(5);
+
+    const total = Number(countRow?.total ?? 0);
+    const visited = Number(countRow?.visited ?? 0);
+    return {
+      totalRestaurants: total,
+      visitedCount: visited,
+      wishlistCount: total - visited,
+      totalCheckIns: Number(checkRow?.count ?? 0),
+      averageRating: avgRow?.avg ? Math.round(Number(avgRow.avg) * 10) / 10 : 0,
+      topCuisines,
+    };
+  }
+}
+
+export const storage: IStorage = process.env.DATABASE_URL
+  ? new DbStorage()
+  : new MemStorage();
