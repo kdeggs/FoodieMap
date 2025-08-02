@@ -53,7 +53,7 @@ export default function CreateListModal({ isOpen, onClose }: CreateListModalProp
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New List</DialogTitle>
