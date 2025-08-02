@@ -78,11 +78,27 @@ export default function ListsView() {
   const featuredLists = lists?.slice(0, 4) || [];
   const allLists = lists || [];
 
-  // Calculate restaurant counts for each list
+  // Get restaurant counts from API data
+  const { data: allListRestaurants } = useQuery({
+    queryKey: ["/api/list-restaurants"],
+    queryFn: async () => {
+      const response = await fetch("/api/list-restaurants");
+      if (!response.ok) return [];
+      return response.json();
+    },
+  });
+
   const getListStats = (listId: string) => {
-    // In a real app, this would come from the API
-    const restaurantCount = Math.floor(Math.random() * 20) + 1;
-    const visitedCount = Math.floor(restaurantCount * 0.6);
+    // Count restaurants in this specific list
+    const listRestaurants = allListRestaurants?.filter((lr: any) => lr.listId === listId) || [];
+    const restaurantCount = listRestaurants.length;
+    
+    // Count visited restaurants in this list
+    const visitedCount = listRestaurants.filter((lr: any) => {
+      const restaurant = restaurants?.find((r: any) => r.id === lr.restaurantId);
+      return restaurant?.isVisited;
+    }).length;
+    
     return { restaurantCount, visitedCount };
   };
 
@@ -106,13 +122,14 @@ export default function ListsView() {
                 Create a new list to organize your restaurants
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleCreateList(); }} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">List Name</label>
                 <Input
                   value={newListName}
                   onChange={(e) => setNewListName(e.target.value)}
                   placeholder="Enter list name"
+                  autoFocus
                 />
               </div>
               <div>
@@ -124,14 +141,24 @@ export default function ListsView() {
                   rows={3}
                 />
               </div>
-              <Button 
-                onClick={handleCreateList}
-                disabled={!newListName.trim() || createListMutation.isPending}
-                className="w-full bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90"
-              >
-                {createListMutation.isPending ? "Creating..." : "Create List"}
-              </Button>
-            </div>
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={!newListName.trim() || createListMutation.isPending}
+                  className="flex-1 bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary))]/90"
+                >
+                  {createListMutation.isPending ? "Creating..." : "Create List"}
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         </Dialog>
 
@@ -162,7 +189,7 @@ export default function ListsView() {
                     'text-gray-600'
                   }`} />
                 </div>
-                <span className="text-xs text-gray-500">{stats.restaurantCount} places</span>
+                <span className="text-xs text-gray-500">{stats.restaurantCount} restaurants</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">{list.name}</h3>
               <p className="text-xs text-gray-600">{list.description}</p>

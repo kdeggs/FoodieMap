@@ -209,6 +209,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // All List-Restaurant relationships
+  app.get("/api/list-restaurants", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userLists = await storage.getLists(userId);
+      const listIds = userLists.map(list => list.id);
+      
+      const allListRestaurants = [];
+      for (const listId of listIds) {
+        const restaurants = await storage.getListRestaurants(listId);
+        for (const restaurant of restaurants) {
+          allListRestaurants.push({
+            listId,
+            restaurantId: restaurant.id,
+            restaurant
+          });
+        }
+      }
+      res.json(allListRestaurants);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch list restaurants" });
+    }
+  });
+
   // List Restaurants
   app.get("/api/lists/:id/restaurants", async (req, res) => {
     try {
@@ -276,9 +300,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Statistics
-  app.get("/api/stats", async (req, res) => {
+  app.get("/api/stats", isAuthenticated, async (req: any, res) => {
     try {
-      const stats = await storage.getStats();
+      const userId = req.user.claims.sub;
+      const stats = await storage.getStats(userId);
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch statistics" });

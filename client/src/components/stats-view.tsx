@@ -31,14 +31,7 @@ export default function StatsView() {
     );
   }
 
-  const currentDate = new Date();
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-  
-  // Mock monthly data for demo
-  const monthlyData = monthNames.map((month, index) => ({
-    month,
-    visits: Math.floor(Math.random() * 30) + 5
-  }));
+  // No fake data - only show real stats
 
   return (
     <div className="p-4">
@@ -49,40 +42,33 @@ export default function StatsView() {
       {/* Overview Cards */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--pin-red))] text-white rounded-xl p-4">
-          <div className="text-3xl font-bold">{stats?.totalCheckIns || 0}</div>
-          <div className="text-sm opacity-90">Total Check-ins</div>
-          <div className="mt-2 text-xs opacity-75">+{Math.floor(Math.random() * 10) + 1} this month</div>
+          <div className="text-3xl font-bold">{stats?.totalRestaurants || 0}</div>
+          <div className="text-sm opacity-90">Total Restaurants</div>
+          <div className="mt-2 text-xs opacity-75">Added to lists</div>
         </div>
         <div className="bg-gradient-to-br from-[hsl(var(--secondary))] to-green-400 text-white rounded-xl p-4">
-          <div className="text-3xl font-bold">{stats?.averageRating || 0}</div>
-          <div className="text-sm opacity-90">Avg Rating</div>
-          <div className="mt-2 text-xs opacity-75">Across all visits</div>
+          <div className="text-3xl font-bold">{stats?.visitedCount || 0}</div>
+          <div className="text-sm opacity-90">Visited Restaurants</div>
+          <div className="mt-2 text-xs opacity-75">Places you've been</div>
         </div>
       </div>
 
-      {/* Monthly Activity */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
-        <h3 className="font-semibold text-lg mb-4">Monthly Activity</h3>
-        <div className="space-y-3">
-          {monthlyData.map((data, index) => {
-            const maxVisits = Math.max(...monthlyData.map(d => d.visits));
-            const widthPercentage = (data.visits / maxVisits) * 100;
-            
-            return (
-              <div key={data.month} className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 w-12">{data.month}</span>
-                <div className="flex-1 mx-3 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-[hsl(var(--primary))] h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${widthPercentage}%` }}
-                  ></div>
-                </div>
-                <span className="text-sm font-medium w-8 text-right">{data.visits}</span>
-              </div>
-            );
-          })}
+      {/* Lists Overview */}
+      {stats?.totalRestaurants && stats.totalRestaurants > 0 && (
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
+          <h3 className="font-semibold text-lg mb-4">Quick Stats</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(var(--primary))]">{stats.wishlistCount || 0}</div>
+              <div className="text-sm text-gray-600">On Wishlist</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(var(--secondary))]">{stats.totalCheckIns || 0}</div>
+              <div className="text-sm text-gray-600">Total Check-ins</div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Cuisine Breakdown */}
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">

@@ -239,7 +239,7 @@ export class MemStorage implements IStorage {
     return checkIn;
   }
 
-  async getStats(): Promise<{
+  async getStats(userId?: string): Promise<{
     totalRestaurants: number;
     visitedCount: number;
     wishlistCount: number;
@@ -247,8 +247,12 @@ export class MemStorage implements IStorage {
     averageRating: number;
     topCuisines: { cuisine: string; count: number }[];
   }> {
-    const restaurants = Array.from(this.restaurants.values());
-    const checkIns = Array.from(this.checkIns.values());
+    // Filter by user if userId is provided
+    const restaurants = Array.from(this.restaurants.values())
+      .filter(r => !userId || r.userId === userId);
+    const userRestaurantIds = new Set(restaurants.map(r => r.id));
+    const checkIns = Array.from(this.checkIns.values())
+      .filter(ci => !userId || userRestaurantIds.has(ci.restaurantId));
     
     const totalRestaurants = restaurants.length;
     const visitedCount = restaurants.filter(r => r.isVisited).length;
