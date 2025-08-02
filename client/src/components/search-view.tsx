@@ -36,7 +36,23 @@ export default function SearchView() {
   const queryClient = useQueryClient();
 
   const { data: searchResults, isLoading: isSearching, error: searchError } = useQuery<SearchResponse>({
-    queryKey: ["/api/search/restaurants", searchQuery, location],
+    queryKey: ["search", searchQuery, location],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        query: searchQuery,
+        location: location
+      });
+      const response = await fetch(`/api/search/restaurants?${params}`, {
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`${response.status}: ${text}`);
+      }
+      
+      return response.json();
+    },
     enabled: searchSubmitted && !!searchQuery && !!location,
     retry: false,
   });
