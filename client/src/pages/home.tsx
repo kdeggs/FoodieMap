@@ -58,14 +58,7 @@ export default function Home() {
               FoodPins
             </h1>
           </div>
-          <div className="flex items-center space-x-3">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Search className="w-5 h-5 text-gray-600" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <User className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+          
         </div>
       </header>
 
